@@ -1,0 +1,5 @@
+*.db*
+cpanfile.snapshot
+*.conf
+local
+public/recipes

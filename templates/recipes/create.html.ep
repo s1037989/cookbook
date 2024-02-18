@@ -1,0 +1,3 @@
+% layout 'cookbook', title => 'New recipe';
+<h2>New recipe</h2>
+%= include 'recipes/_form', caption => 'Create', target => 'store_recipe'

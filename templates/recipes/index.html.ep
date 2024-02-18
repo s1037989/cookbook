@@ -1,0 +1,19 @@
+% layout 'cookbook', title => 'Cookbook';
+% if ($meal) {
+  <h1>Recipes for <%= $meal %></h1>
+  % $recipes->each(sub {
+    <h2><%= link_to $_->{title} => show_recipe => {id => $_->{id}} %></h2>
+    <p>
+      %= $_->{recipe}
+    </p>
+  % });
+% }
+% else {
+  %= form_for recipes => (method => 'GET') => begin
+  %= select_field meal => [qw(Breakfast Lunch Dinner Snack Dessert)];
+  %= submit_button 'Find recipes'
+  % end
+% }
+% if (session('admin')) {
+  %= link_to 'New recipe' => 'create_recipe'
+% }

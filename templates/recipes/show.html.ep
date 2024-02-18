@@ -1,0 +1,9 @@
+% layout 'cookbook', title => $recipe->{title};
+<h2><%= $recipe->{title} %></h2>
+<p><%= $recipe->{recipe} %></p>
+<p><%= $recipe->{shopping_list} %></p>
+<p><%= link_to 'View PDF' => "/recipes/$recipe->{id}.pdf" %></p>
+<p><%= image "/recipes/$recipe->{id}.png" %></p>
+% if (session('admin')) {
+  %= link_to 'Edit' => edit_recipe => {id => $recipe->{id}}
+% }
