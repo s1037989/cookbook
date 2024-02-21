@@ -4,7 +4,7 @@
   % $recipes->each(sub {
     <h2><%= link_to $_->{title} => show_recipe => {id => $_->{id}} %></h2>
     <p>
-      %= image "/recipes/$_->{id}.png", alt => $_->{title}, width => 100, height => 100
+      %= image "/recipes/$_->{id}.png", alt => $_->{title}, width => 300, height => 300
     </p>
   % });
 % }
