@@ -1,5 +1,7 @@
 package Cookbook::Controller::Recipes;
-use Mojo::Base 'Mojolicious::Controller';
+use Mojo::Base 'Mojolicious::Controller', -signatures;
+
+use Mojo::Util qw(b64_encode);
 
 sub create { shift->render(recipe => {}) }
 
@@ -32,18 +34,42 @@ sub show {
 }
 
 sub store {
-  my $self = shift;
+  my $self = shift->render_later;
 
   my $validation = $self->_validation;
   return $self->render(action => 'create', recipe => {})
     if $validation->has_error;
 
   my $pdf = delete $validation->output->{pdf};
-  my $img = delete $validation->output->{img};
+  #my $img = delete $validation->output->{img};
   my $id = $self->recipes->add($validation->output);
   $pdf->move_to($self->app->home->child('public', 'recipes')->make_path->child("$id.pdf"));
-  $img->move_to($self->app->home->child('public', 'recipes')->make_path->child("$id.png"));
-  $self->redirect_to('show_recipe', id => $id);
+  my $url = Mojo::URL->new($self->config->{convertapi}->{url});
+  $url->query({Secret => $self->config->{convertapi}->{secret}});
+  $self->ua->post("$url" => json => {
+    Parameters => [
+      {
+        Name => 'File',
+        FileValue => {
+          Name => 'file.pdf',
+          Data => b64_encode($pdf->slurp),
+        }
+      },
+      {
+        Name => 'StoreFile',
+        Value => Mojo::JSON->true,
+      },
+    ],
+  } => sub {
+    my ($ua, $tx) = @_;
+    my $res = $tx->result;
+    return $self->reply->exception($res->message) unless $res->is_success;
+    $self->ua->get($res->json->{Files}[0]{Url} => sub ($ua, $tx) {
+      $tx->res->content->asset->move_to($self->app->home->child('public', 'recipes')->make_path->child("$id.png"));
+      $self->redirect_to('show_recipe', id => $id);
+    });
+  });
+  #$img->move_to($self->app->home->child('public', 'recipes')->make_path->child("$id.png"));
 }
 
 sub update {
@@ -53,12 +79,36 @@ sub update {
   return $self->render(action => 'edit', recipe => {}) if $validation->has_error;
 
   my $pdf = delete $validation->output->{pdf};
-  my $img = delete $validation->output->{img};
+  #my $img = delete $validation->output->{img};
   my $id = $self->param('id');
   $self->recipes->save($id, $validation->output);
   $pdf->move_to($self->app->home->child('public', 'recipes')->make_path->child("$id.pdf")) if $pdf;
-  $img->move_to($self->app->home->child('public', 'recipes')->make_path->child("$id.png")) if $img;
-  $self->redirect_to('show_recipe', id => $id);
+  my $url = Mojo::URL->new($self->config->{convertapi}->{url});
+  $url->query({Secret => $self->config->{convertapi}->{secret}});
+  $self->ua->post("$url" => json => {
+    Parameters => [
+      {
+        Name => 'File',
+        FileValue => {
+          Name => 'file.pdf',
+          Data => b64_encode($pdf->slurp),
+        }
+      },
+      {
+        Name => 'StoreFile',
+        Value => Mojo::JSON->true,
+      },
+    ],
+  } => sub {
+    my ($ua, $tx) = @_;
+    my $res = $tx->result;
+    return $self->reply->exception($res->message) unless $res->is_success;
+    $self->ua->get($res->json->{Files}[0]{Url} => sub ($ua, $tx) {
+      $tx->res->content->asset->move_to($self->app->home->child('public', 'recipes')->make_path->child("$id.png"));
+      $self->redirect_to('show_recipe', id => $id);
+    });
+  });
+  #$img->move_to($self->app->home->child('public', 'recipes')->make_path->child("$id.png")) if $img;
 }
 
 sub _validation {
@@ -67,7 +117,7 @@ sub _validation {
   my $validation = $self->validation;
   $validation->required('title', 'not_empty');
   $validation->optional('pdf')->upload;
-  $validation->optional('img')->upload;
+  #$validation->optional('img')->upload;
   $validation->required('recipe',  'not_empty');
   $validation->required('shopping_list',  'not_empty');
   $validation->required('meal',  'not_empty');

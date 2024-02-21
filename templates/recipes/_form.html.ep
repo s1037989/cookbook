@@ -7,10 +7,6 @@
   <br>
   %= file_field 'pdf'
   <br>
-  %= label_for img => 'Image'
-  <br>
-  %= file_field 'img'
-  <br>
   %= label_for recipe => 'Recipe'
   <br>
   %= text_area recipe => $recipe->{recipe}
