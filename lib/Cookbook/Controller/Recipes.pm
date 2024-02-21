@@ -52,8 +52,12 @@ sub update {
   my $validation = $self->_validation;
   return $self->render(action => 'edit', recipe => {}) if $validation->has_error;
 
+  my $pdf = delete $validation->output->{pdf};
+  my $img = delete $validation->output->{img};
   my $id = $self->param('id');
   $self->recipes->save($id, $validation->output);
+  $pdf->move_to($self->app->home->child('public', 'recipes')->make_path->child("$id.pdf")) if $pdf;
+  $img->move_to($self->app->home->child('public', 'recipes')->make_path->child("$id.png")) if $img;
   $self->redirect_to('show_recipe', id => $id);
 }
 

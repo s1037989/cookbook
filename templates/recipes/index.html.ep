@@ -15,5 +15,6 @@
   % end
 % }
 % if (session('admin')) {
-  %= link_to 'New recipe' => 'create_recipe'
+  <p><%= link_to 'New recipe' => 'create_recipe' %></p>
+  <p><%= link_to 'Rotate recipes' => 'rotate_recipes' %></p>
 % }
