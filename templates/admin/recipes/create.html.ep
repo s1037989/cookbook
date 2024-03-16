@@ -1,0 +1,9 @@
+% layout 'mealmaps', title => 'New recipe';
+% content headline => '';
+% content main_form => '';
+% content overlay => '';
+
+% content solid => begin
+<h2>New recipe</h2>
+%= include 'admin/recipes/_form', caption => 'Create', target => 'store_recipe'
+% end

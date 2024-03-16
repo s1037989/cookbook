@@ -1,0 +1,24 @@
+% layout 'mealmaps', title => 'MealMAPS Login';
+
+% content headline => begin
+  Login to the MealMAPS system to create and edit meal MAPS today!
+% end
+% content main_form => begin
+% end
+% content overlay => begin
+% end
+% content solid => begin
+  % if ( my $error = flash 'error' ) {
+    <p><%= $error %></p>
+  % }
+  %= form_for process_login => (method => 'POST') => begin
+    <br />
+    %= label_for username => 'Username'
+    %= text_field 'username'
+    <br />
+    %= label_for password => 'Password'
+    %= password_field 'password'
+    <br />
+    %= submit_button 'Login'
+  % end
+% end

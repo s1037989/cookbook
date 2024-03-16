@@ -1,0 +1,15 @@
+% layout 'mealmaps', title => 'Edit Profile';
+% content headline => '';
+% content main_form => '';
+
+% content overlay => begin
+  <h2>Build a Retirement Plan Proposal today!</h2>
+  <p>Welcome, <%= user->name %> of <%= user->tpa->name %></p>
+  <p>Fill in the form below to prepare a new proposal today!</p>
+% end
+% content solid => begin
+  <h2>Edit Profile</h2>
+  %= include 'profile/_form', caption => 'Update', target => 'update_profile'
+  <%= link_to 'One-Click One-Time Login Link' => url_for('proposals')->query(jwt => $c->jwt->encode($user->{user_id})) %>
+  (Expires <%= Mojo::Date->new(time + app->sessions->default_expiration) %>)
+% end

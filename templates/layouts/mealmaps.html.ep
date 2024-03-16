@@ -1,0 +1,161 @@
+% my $active = begin
+  % my $name = shift;
+  % return (class => join ' ', shift, current_section($name) ? 'active' : ());
+% end
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8" />
+        <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+        <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+        <title><%= title %></title>
+        %= stylesheet '/assets/css/main.css'
+        %= stylesheet sprintf '/assets/css/%s.css', session('color')||'sky'
+        %#= stylesheet '/bootstrap/css/bootstrap.min.css'
+        %= stylesheet '//maxcdn.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css'
+        %#= stylesheet '//cdnjs.cloudflare.com/ajax/libs/bootstrap-slider/11.0.2/css/bootstrap-slider.min.css'
+        %#= stylesheet 'https://fonts.googleapis.com/css?family=Muli:400,700|News+Cycle'
+        %#= javascript 'https://code.jquery.com/jquery-1.11.2.min.js'
+
+        %#= stylesheet '//yegor256.github.io/tacit/tacit.min.css'
+        %= javascript '//code.jquery.com/jquery-3.4.1.slim.min.js'
+        %= javascript '//cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js'
+        %= javascript '//maxcdn.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js'
+        %#= javascript '//cdnjs.cloudflare.com/ajax/libs/bootstrap-slider/11.0.2/bootstrap-slider.min.js'
+
+        %#= javascript '/js/menu.js'
+        %= javascript begin
+          $(document).ready(function() {
+            $("a.btn-spinner").click(function() {
+              console.log('clicked');
+              var $btn = $(this);
+              var $btn_html = $btn.html();
+              $btn.html('<i class="busy"></i> ' + $btn_html);
+              setTimeout(function() {
+                $btn.html($btn_html);
+              }, 10000);
+            });
+          });
+        % end
+        <style>
+          label.field-with-error { color: #dd7e5e }
+          input.field-with-error { background-color: #fd9e7e }
+        </style>
+    </head>
+    <body>
+        <div class="container">
+            <!-- Top navigation -->
+            <nav id="primary" class="navbar">
+                <div class="container-fluid">
+                    <!-- I recommend keeping 3 or fewer items in the navigation, or they might
+                          not all fit nicely on mobile. If this ends up being a problem sometime,
+                          just let me know and I'll change the mobile setup. -->
+                    <ul class="nav nav-pills justify-content-end">
+                        <li class="nav-item"><%= link_to 'MealMAPS Home' => 'home', $active->('home', 'nav-item nav-link') %></li>
+                        % if (stash_session('user.admin')) {
+                        <li class="nav-item"><%= link_to 'Minion' => 'minion', $active->('minion', 'nav-item nav-link') %></li>
+                        <li class="nav-item"><%= link_to 'Manage Recipes' => 'recipes', $active->('tpas', 'nav-item nav-link') %></li>
+                        <li class="nav-item"><%= link_to 'Manage Users' => 'users', $active->('users', 'nav-item nav-link') %></li>
+                        % }
+                        % if (stash_session('user.username')) {
+                        <li class="nav-item"><%= link_to 'Profile' => 'profile', $active->('profile', 'nav-item nav-link') %></li>
+                        <li class="nav-item"><%= link_to 'Logout' => 'logout', $active->('logout', 'nav-item nav-link') %></li>
+                        % } else {
+                        <li class="nav-item"><%= link_to 'Login' => 'login', $active->('login', 'nav-item nav-link') %></li>
+                        % }
+                        <!-- Both buttons or normal links are available in the navigation bar.
+                              Nothing special here, just the standard bootstrap classes -->
+                        <!-- <li class="nav-item"><button class="btn btn-default navbar-btn">Button</button></li> -->
+                    </ul>
+                </div>
+             </nav>
+             <!-- Large white heading -->
+             <%= image '/images/mealmaps.png' %>
+             <p><%= 1 %> Participants with <%= currency 1 %> from <%= 1 %> Plans
+             %# since <%= date($c->stats->started) %>
+             </p>
+        </div>
+        <!-- Any content inside the "overlay" div will have the background image visible behind it.
+             If your content is too long, it will probably extent past the bottom of the image. If
+             this is the case, try moving some of the less important stuff to the "solid" div below,
+             or you can upload a taller image. -->
+        <div id="overlay">
+            <div class="container">
+                <!-- The class "main-form" is needed on the form at the top of the page to have the
+                     correct styling. All other classes included within the form are straight bootstrap.
+                     To turn the form off, just don't put a <form> inside this div. -->
+                % unless (1) {
+                %= content main_form => begin
+                <div class="main-form">
+                <form>
+                   <p>Form Title Here</p>
+                    <div class="form-group">
+                        <label for="formName">Name</label>
+                        <input type="text" class="form-control" id="formName" placeholder="Name">
+                    </div>
+                    <div class="form-group">
+                        <label for="formEmail">Email</label>
+                        <input type="email" class="form-control" id="formEmail" placeholder="Email">
+                    </div>
+                    <button type="submit" class="btn btn-default">Sign Up</button>
+                </form>
+                </div>
+                % end
+                % }
+                <!-- This is the bold headline shown as the first line of text inside the white overlay
+                     on the image. The text can be changed or removed. The "headline" class is required
+                     for proper styling. -->
+                %= content headline => begin
+                <p class="headline">Really Catchy Headline</p>
+                <h2>Here's Why You Need This:</h2>
+                <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat Lorem ipsum dolor sit amet.</p>
+                <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat Lorem ipsum dolor sit amet.</p>
+                % end
+                %= content overlay => begin
+                <h2>Internal Page Content</h2>
+                <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat Lorem ipsum dolor sit amet.</p>
+                % end
+            </div>
+        </div>
+        <!-- Any text inside the "solid" div will have a solid white background behind it -->
+        <div id="solid">
+            <div class="container">
+                <!-- Light blue box on the bottom left of the page. This box is set to always stay on
+                     the left side of the page and anything that comes after it will wrap around to its
+                     right. To remove this, remove the entire div. -->
+                % if (my $error = flash('error') || stash('error')) {
+                  <div class="alert alert-danger" role="alert"><%= $error %></div>
+                % }
+                % if (my $message = flash('message') || stash('message')) {
+                  <div class="alert alert-success" role="alert"><%= $message %></div>
+                % }
+                %= content solid => begin
+                <h2>Tables, Forms, Text, Images, Etc.</h2>
+                <div class="feature-box">
+                    <p>The color of this box will change with each color scheme. The box is meant to bring attention to featured content, reviews, etc. If you have nothing to feature, just don't use it. Simple!</p>
+                    <p>
+                      <ul>
+                        % my $color = session('color') || '';
+                        % for ( qw/bold bright earthy sailboat sky/ ) {
+                        <li><%== '<strong>' if $_ eq $color %><%= link_to ucfirst($_) => 'color', {color => $_} %><%== '</strong>' if $_ eq $color %></li>
+                        % }
+                      </ul>
+                    </p>
+                </div>
+                <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat Lorem ipsum dolor sit amet.</p>
+                <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat Lorem ipsum dolor sit amet.</p>
+                % end
+            </div>
+        </div>
+        <!-- Footer navigation -->
+        <div id="footer" class="container-fluid">
+             <nav>
+                 <div class="container-fluid">
+                    <ul class="nav navbar-nav navbar-right">
+                        <li><a href="#"><%= config('copyright') %></a></li>
+                    </ul>
+                 </div>
+             </nav>
+        </div>
+    </body>
+</html>

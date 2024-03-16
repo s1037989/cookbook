@@ -1,0 +1,140 @@
+% my $checkbox = begin
+  % my ($tag_type, $tag, $label) = @_;
+  % my $id = $tag_type . '__' . $tag;
+  <div class="form-check">
+    <input class="form-check-input" type="checkbox" value="" id="<%= $id %>">
+    <label class="form-check-label" for="<%= $id %>">
+      <%= $label %>
+    </label>
+  </div>
+% end
+
+% my $ingredient_field = begin
+  % my ($label, $name, $value) = @_;
+  <div class="input-group mb-3">
+    <div class="input-group-prepend">
+      %= label_for $name => $label, (class => 'input-group-text')
+    </div>
+    <input type="number" class="form-control" id="quantity1" placeholder="Quantity">
+    <select class="form-control" id="unit1">
+      <option>Grams</option>
+      <option>Kilograms</option>
+      <option>Liters</option>
+      <option>Milliliters</option>
+      <!-- Add more units as needed -->
+    </select>
+    <input type="text" class="form-control" id="ingredient1" placeholder="Ingredient Name">
+  </div>
+% end
+
+% my $text_field = begin
+  % my ($label, $name, $value) = @_;
+  <div class="input-group mb-3">
+    <div class="input-group-prepend">
+      %= label_for $name => $label, (class => 'input-group-text')
+    </div>
+    %= text_field $name => $value, (class => "form-control")
+  </div>
+% end
+
+% my $number_field = begin
+  % my ($label, $name, $value) = @_;
+  <div class="input-group mb-3">
+    <div class="input-group-prepend">
+      %= label_for $name => $label, (class => 'input-group-text')
+    </div>
+    %= number_field $name => $value, (class => "form-control")
+  </div>
+% end
+
+% my $file_field = begin
+  % my ($label, $name, $value) = @_;
+  <div class="input-group mb-3">
+    <div class="input-group-prepend">
+      %= label_for $name => $label, (class => 'input-group-text')
+    </div>
+    %= file_field $name => $value, (class => "form-control")
+  </div>
+% end
+
+<div class="container">
+%= form_for $target => (enctype => 'multipart/form-data') => begin
+
+  <fieldset class="form-group">
+    <legend>Recipe</legend>
+    %= $text_field->('Title', title => $recipe->{title})
+    %= $file_field->('Image', image => $recipe->{image})
+    %= $file_field->('Original PDF', original_pdf => $recipe->{original_pdf})
+    %= $file_field->('Modified PDF', modified_pdf => $recipe->{modified_pdf})
+    %= $number_field->('Servings', servings => $recipe->{servings})
+    %= $number_field->('Maximum Preparation Time (in minutes)', max_prep_time => $recipe->{max_prep_time})
+    %= $number_field->('Experience Level', exp_level => $recipe->{exp_level})
+    %= $number_field->('Category', category => $recipe->{category})
+  </fieldset>
+
+  <fieldset class="form-group">
+    <legend>Meals</legend>
+    % my $meals = config 'meals';
+    % foreach (@$meals) {
+      %= $checkbox->(meals => @$_)
+    % }
+  </fieldset>
+
+  <fieldset class="form-group">
+    <legend>Seasons</legend>
+    % my $seasons = config 'seasons';
+    % foreach (@$seasons) {
+      %= $checkbox->(seasons => @$_)
+    % }
+  </fieldset>
+
+  <fieldset class="form-group">
+    <legend>Allergies</legend>
+    % my $allergies = config 'allergies';
+    % foreach (@$allergies) {
+      %= $checkbox->(allergies => @$_)
+    % }
+  </fieldset>
+
+  <fieldset class="form-group">
+    <legend>Religious Practices</legend>
+    % my $religious = config 'religious';
+    % foreach (@$religious) {
+      %= $checkbox->(religious => @$_)
+    % }
+  </fieldset>
+
+  <fieldset class="form-group">
+    <legend>Dietary Restrictions</legend>
+    % my $diets = config 'diets';
+    % foreach (@$diets) {
+      %= $checkbox->(diets => @$_)
+    % }
+  </fieldset>
+
+  <fieldset class="form-group">
+    <legend>Food Dislikes</legend>
+    % my $dislikes = config 'dislikes';
+    % foreach (@$dislikes) {
+      %= $checkbox->(dislikes => @$_)
+      %= $checkbox->(optional_dislikes => @$_)
+    % }
+  </fieldset>
+
+  <fieldset class="form-group">
+    <legend>Eating Disorder Struggles</legend>
+    % my $fear_foods = config 'fear_foods';
+    % foreach (@$fear_foods) {
+      %= $checkbox->(fear_foods => @$_)
+    % }
+  </fieldset>
+
+  <fieldset class="form-group">
+    <legend>Ingredients</legend>
+    %= $ingredient_field->('Ingredient 1', 'ingredient1', $recipe->{ingredient1})
+    %= $ingredient_field->('Ingredient 2', 'ingredient2', $recipe->{ingredient2})
+  </fieldset>
+
+  %= submit_button $caption
+% end
+</div>

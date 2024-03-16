@@ -1,0 +1,5 @@
+% layout 'mealmaps', title => 'Edit recipe';
+<h2>Edit recipe</h2>
+%= include 'recipes/_form', caption => 'Update', target => 'update_recipe'
+<p><%= image "recipes/$recipe->{id}.png" %></p>
+%= button_to Remove => remove_recipe => {id => $recipe->{id}}

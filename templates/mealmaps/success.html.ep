@@ -1,0 +1,10 @@
+% layout 'mealmaps';
+% title 'Success!';
+
+% content headline => '';
+% content main_form => '';
+
+% content overlay => begin
+  <h2>Build a Meal MAPS Meal Plan today!</h2>
+% end
+% content solid => '';

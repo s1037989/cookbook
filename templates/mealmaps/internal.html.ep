@@ -1,0 +1,11 @@
+% layout 'mealmaps', title => 'Mojolicious Classic Template (Internal)';
+
+%# Internal pages probably don't have a headline or main_form, so unset them
+% content headline => '';
+% content main_form => '';
+%# Uncomment and provide content for these or else default Lorem ipsum will be rendered
+%# content overlay => begin
+%# end
+%# content solid => begin
+%# end
+

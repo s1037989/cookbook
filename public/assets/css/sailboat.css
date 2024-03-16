@@ -1,0 +1,70 @@
+/* Custom styles for the RetireQuote site */
+/* 
+    Color Definitions:
+        Light Orange:   #f15a29
+        Dark Orange:    #f15a29
+        Light Blue:     #00aeef
+        Dark Blue:      #2b3990
+    Font Definitions:
+        Logo Font: 'Cinzel', serif;
+        Option Links: sans-serif
+        Content: Helvetica
+
+*/
+html {
+    position: relative;
+    min-height: 100%;
+}
+
+body {
+    /* Margin bottom by footer height */
+    margin-bottom: 60px;
+}
+
+#rq-navbar {
+    background-color: #2b3990; 
+    font-family: Helvetica, sans-serif;
+}
+
+#rq-navbar .nav-link {
+    color: white; 
+}
+
+.rq-navbar-logo {
+    width: 200px;
+    height: 50px;
+}
+
+.footer {
+    position: absolute;
+    bottom: 0;
+    width: 100%;
+    /* Set the fixed height of the footer here */
+    height: 60px;
+    line-height: 60px;
+    color: white; 
+    background-color: black;
+    font-family: Helvetica, sans-serif;
+}
+
+#banner-img {
+    position: absolute;
+    /* Top should negate the navbar height */
+    top: 60px;
+    left: 0; 
+    z-index: -1;
+    height: 70vh; 
+    min-width: 100vw; 
+    background: url(../img/sailboatBanner.jpg);
+    background-size: cover;
+    background-repeat: no-repeat;
+    background-position: 75% 20%;
+    background-color: black;
+}
+
+#landing-content {
+    margin-top: 40px; 
+    text-align: center;
+    color: white;
+    font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
+}

@@ -1,0 +1,39 @@
+% layout 'mealmaps', title => 'MealMAPS, LLC';
+
+% content headline => begin
+  <p class="headline">A Quote to Retire By!</p>
+  <h2>Prepare a perfect quote in minutes!</h2>
+  <p>With just a few pieces of information, generate a ready-to-deliver quote for financial advisors in minutes.</p>
+  <p>Time is money, don't keep them waiting.</p>
+% end
+% content main_form => begin
+  <div class="main-form">
+  %= form_for process_login => (method => 'POST') => begin
+  <p>Login</p>
+  <div class="form-group">
+  %= label_for username => 'Username'
+  %= text_field 'username', (class => 'form-control')
+  </div>
+  <div class="form-group">
+  %= label_for password => 'Password'
+  %= password_field 'password', (class => 'form-control')
+  </div>
+  %= submit_button 'Login', (class => 'btn btn-default')
+  % end
+  </div>
+% end
+% content overlay => begin
+  <h2>Don't mess with Record Keeper's formulas</h2>
+  <p>Let RetireQuote handle all the math for communicating costs to the client, and ensure your ERISA services are covered, too.</p>
+% end
+% content solid => begin
+  <h2>RetireQuote is growing!</h2>
+  <div class="feature-box">
+    <p>Now generate Service Agreements just as quickly as Proposals since 2019!</p>
+  </div>
+  <p>Provide your own proposal document and let RetireQuote slip in a couple extra pages to show the costs.</p>
+  <p>Don't leave the client wondering and with time to think about other options... Provide everything they need to know so they can make a decision today!</p>
+  <p><%= dumper $c->session %></p>
+  <p><%= dumper stash 'session' %></p>
+% end
+

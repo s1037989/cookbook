@@ -1,0 +1,194 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <title>
+        <%= title %>
+    </title>
+    <meta name="description"
+        content="A website designed to take the work out of meal planning.  Target audience is people with eating disorders. Users have their own profiles and select recipes they want added to their meal plan.">
+    <meta name="generator" content="WYSIWYG Web Builder 19 Trial Version - https://www.wysiwygwebbuilder.com">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    %= stylesheet 'https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css'
+    %= stylesheet 'https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.13.2/themes/base/jquery-ui.min.css'
+    %= stylesheet 'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/fontawesome.min.css'
+    %= stylesheet 'https://fonts.googleapis.com/css2?family=Open+Sans:wdth,wght@75..100,300..800&400,700&display=swap'
+    %#= stylesheet 'css/Untitled2.css'
+    %= stylesheet 'css/mealmaps.css'
+    %= javascript 'https://code.jquery.com/jquery-3.7.1.min.js'
+    %= javascript 'https://cdnjs.cloudflare.com/ajax/libs/popper.js/2.9.2/umd/popper.min.js'
+    %= javascript 'https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js'
+    %= javascript 'https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.13.2/jquery-ui.min.js'
+    <script>
+        document.addEventListener('DOMContentLoaded', function (event) {
+            var headerMenu_dropdownToggle = document.querySelectorAll('#headerMenu .dropdown-toggle');
+            headerMenu_dropdownToggle.forEach(item => {
+                var dropdown = new bootstrap.Dropdown(item, { popperConfig: { placement: item.getAttribute('data-bs-placement') } });
+            });
+            var headerMenu_dropdown = document.querySelectorAll('#headerMenu .dropdown');
+            headerMenu_dropdown.forEach(item => {
+                item.addEventListener('shown.bs.dropdown', function (e) {
+                    e.currentTarget.classList.add('show');
+                });
+                item.addEventListener('hidden.bs.dropdown', function (e) {
+                    e.currentTarget.classList.remove('show');
+                });
+            });
+        });
+    </script>
+    <script>
+        $(document).ready(function () {
+            $("a[href*='#headerLayoutGrid']").click(function (event) {
+                event.preventDefault();
+                $('html, body').stop().animate({ scrollTop: $('#wb_headerLayoutGrid').offset().top }, 600, 'easeOutCirc');
+            });
+            $("#homeButton1").button({});
+        });
+    </script>
+</head>
+
+<body class="wb-theme-content">
+    %# Thumbnail
+    %= link_to recipes => begin
+        <%= image "images/mealmaps.png" , (style=> "position:absolute;left:441px;top:967px;margin:0;border-width:0;z-index:250", width => 16, height => 16) %>
+    % end
+    <div id="wb_headerLayoutGrid">
+        <div id="headerLayoutGrid">
+            <div class="col-1">
+                <div id="wb_headerHeading" style="display:block;width:100%;z-index:0;">
+                %= link_to recipes => begin
+                    %= image 'images/mealmaps.png', (style => 'width:100px;', alt => 'Meal Maps')
+                % end
+                </div>
+            </div>
+            <div class="col-2">
+                <div id="wb_headerMenu" style="display:inline-block;width:345px;height:54px;z-index:1;">
+                    <div id="headerMenu" class="headerMenu" style="width:100%;height:auto !important;">
+                        <div class="container">
+                            <div class="navbar-header">
+                                <button title="" type="button" class="navbar-toggle" data-bs-toggle="collapse"
+                                    data-bs-target=".headerMenu-navbar-collapse">
+                                    <span class="icon-bar"></span>
+                                    <span class="icon-bar"></span>
+                                    <span class="icon-bar"></span>
+                                </button>
+                            </div>
+                            <div class="headerMenu-navbar-collapse collapse">
+                                <ul class="nav navbar-nav">
+                                    <li class="nav-item">
+                                        <a href="./about.html" title="About" class="nav-link">About</a>
+                                    </li>
+                                    <li class="nav-item">
+                                        <a href="./contact.html" title="Contact" class="nav-link">Contact</a>
+                                    </li>
+                                    <li class="nav-item">
+                                        %= link_to 'Fork Me on GitHub' => 'https://github.com/s1037989/mealmaps', (class => 'nav-link')
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-3">
+                % if (session('admin')) {
+                %= link_to 'Logout' => 'logout', (style => 'display:inline-block;width:67px;height:45px;z-index:2;', id => 'headerButton1')
+                % }
+                % else {
+                %= link_to 'Login' => 'login', (style => 'display:inline-block;width:67px;height:45px;z-index:2;', id => 'headerButton1')
+                % }
+                <a id="headerButton2" href="" style="display:inline-block;width:169px;height:45px;z-index:3;">Call us +001 222 555</a>
+            </div>
+        </div>
+    </div>
+    <div id="wb_homeLayoutGrid" class="wb-theme-content">
+        <div id="homeLayoutGrid">
+            <div class="row">
+                <div class="col-1">
+                    <div id="wb_homeIcon"
+                        style="display:inline-block;width:62px;height:62px;text-align:center;z-index:4;"
+                        class="wb-theme-content">
+                        <div id="homeIcon"><i class="fa fa-globe"></i></div>
+                    </div>
+                    <div id="wb_homeHeading" style="display:block;width:100%;z-index:5;">
+                        <h1 id="homeHeading" class="wb-theme-header">Design Excellence: Where Creativity Meets
+                            Functionality
+                        </h1>
+                    </div>
+                    <div id="wb_homeText" class="wb-theme-content">
+                        % my $meals = config 'meals';
+                        % foreach my $meal (@$meals) {
+                        <p>
+                            <%= scalar @{session->{plan}->{$meal->[0]}} %> / <%= config 'meal_options' %> <%= $meal->[1] %>
+                        </p>
+                        % }
+                        <p>
+                            <%= link_to 'Empty Plan'=> empty_plan => {meal => param 'meal'} %>
+                        </p>
+                        <p>
+                            <%= link_to 'View Plan'=> 'view_plan' %>
+                        </p>
+                        %= content
+                    </div>
+                    <!--
+                    <div id="wb_homeButton1" style="display:inline-block;width:159px;height:36px;z-index:7;">
+                        <a class="ui-button ui-corner-all wb-theme-button" id="homeButton1" href=""
+                            style="width:100%;height:100%;">Primary button</a>
+                    </div>
+                    <div id="wb_homeButton2" style="display:inline-block;width:131px;height:36px;z-index:8;">
+                        <a class="ui-button ui-corner-all" id="homeButton2" href=""
+                            style="width:100%;height:100%;">Secondary</a>
+                    </div>
+                    -->
+                </div>
+            </div>
+        </div>
+    </div>
+    <div id="wb_footer">
+        <div id="footer">
+            <div class="col-1">
+                <div id="wb_footerHeading1" style="display:block;width:100%;z-index:9;">
+                    <h2 id="footerHeading1">Meal Maps</h2>
+                </div>
+                <div id="wb_footerText">
+                    <span style="color:#FFFFFF;font-family:Arial;font-size:15px;line-height:22px;">742 Evergreen
+                        Terrace<br>Springfield<br>​<br>Monday-Saturday : 5am-8pm<br>Sunday: 6am -3pm</span>
+                </div>
+                <div id="wb_footerHeading2" style="display:block;width:100%;z-index:11;">
+                    <h3 id="footerHeading2">Follow Us</h3>
+                </div>
+                <div id="wb_footerIcon1"
+                    style="display:inline-block;width:16px;height:17px;text-align:center;z-index:12;">
+                    <a href="./index.html">
+                        <div id="footerIcon1"><i class="fa fa-brands fa-x-twitter"></i></div>
+                    </a>
+                </div>
+                <div id="wb_footerIcon2"
+                    style="display:inline-block;width:16px;height:17px;text-align:center;z-index:13;">
+                    <a href="./index.html">
+                        <div id="footerIcon2"><i class="fa fa-brands fa-instagram"></i></div>
+                    </a>
+                </div>
+                <div id="wb_footerIcon3"
+                    style="display:inline-block;width:16px;height:17px;text-align:center;z-index:14;">
+                    <a href="./index.html">
+                        <div id="footerIcon3"><i class="fa fa-brands fa-facebook"></i></div>
+                    </a>
+                </div>
+                <div id="wb_footerIcon4"
+                    style="display:inline-block;width:16px;height:17px;text-align:center;z-index:15;">
+                    <a href="./index.html">
+                        <div id="footerIcon4"><i class="fa fa-brands fa-linkedin"></i></div>
+                    </a>
+                </div>
+                <div id="wb_footerCopyrights">
+                    <span style="color:#FFFFFF;font-family:Arial;font-size:13px;">© Copyright 2024 WYSIWYG Web
+                        Builder</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+
+</html>

@@ -1,0 +1,14 @@
+% layout 'mealmaps';
+
+% if (1) {
+    %= link_to 'Print Plan' => 'generate_plan', class => 'btn btn-primary'
+% }
+<h1>Weekly Meal Plan</h1>
+% foreach my $meal (config->{meals}->@*) {
+    <h1><%= ucfirst $meal %></h1>
+    % foreach my $id (@{$plan->{$meal}}) {
+        % my $recipe = $c->recipes->find($id);
+        <h2><%= $recipe->{title} %></h2>
+        <p><%= image "recipes/$recipe->{id}.png", width => 300 %></p>
+    % }
+% }
