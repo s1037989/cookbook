@@ -94,6 +94,28 @@ insert into enum_units (unit, name, seq) values ('liter', 'Liter', 11);
 insert into enum_units (unit, name, seq) values ('milliliter', 'Milliliter', 12);
 insert into enum_units (unit, name, seq) values ('other', 'Other', 1000);
 
+create table if not exists enum_exp_levels (
+  exp_level   varchar(100) primary key collate nocase not null,
+  name        text not null,
+  seq         integer
+);
+insert into enum_exp_levels (exp_level, name, seq) values ('beginner', 'Beginner', 1);
+insert into enum_exp_levels (exp_level, name, seq) values ('intermediate', 'Intermediate', 2);
+insert into enum_exp_levels (exp_level, name, seq) values ('advanced', 'Advanced', 3);
+
+create table if not exists enum_source_types (
+  source_type varchar(100) primary key collate nocase not null,
+  name        text not null,
+  seq         integer
+);
+insert into enum_source_types (source_type, name, seq) values ('book', 'Book', 1);
+insert into enum_source_types (source_type, name, seq) values ('website', 'Website', 2);
+insert into enum_source_types (source_type, name, seq) values ('magazine', 'Magazine', 3);
+insert into enum_source_types (source_type, name, seq) values ('tv_show', 'TV Show', 4);
+insert into enum_source_types (source_type, name, seq) values ('other', 'Other', 5);
+
+
+
 
 create table if not exists settings (
   id          integer primary key autoincrement,
@@ -108,26 +130,6 @@ create table if not exists options (
   option      text collate nocase not null,
   foreign key (setting_id) references settings (id)
 );
-
-create table if not exists exp_levels (
-  exp_level   varchar(100) primary key collate nocase not null,
-  name        text not null,
-  seq         integer unique
-);
-insert into exp_levels (exp_level, name, seq) values ('beginner', 'Beginner', 1);
-insert into exp_levels (exp_level, name, seq) values ('intermediate', 'Intermediate', 2);
-insert into exp_levels (exp_level, name, seq) values ('advanced', 'Advanced', 3);
-
-create table if not exists source_types (
-  source_type varchar(100) primary key collate nocase not null,
-  name        text not null,
-  seq         integer unique
-);
-insert into source_types (source_type, name, seq) values ('book', 'Book', 1);
-insert into source_types (source_type, name, seq) values ('website', 'Website', 2);
-insert into source_types (source_type, name, seq) values ('magazine', 'Magazine', 3);
-insert into source_types (source_type, name, seq) values ('tv_show', 'TV Show', 4);
-insert into source_types (source_type, name, seq) values ('other', 'Other', 5);
 
 create table if not exists recipes (
   id            integer primary key autoincrement,

@@ -9,14 +9,16 @@ use lib curfile->dirname->sibling('lib')->to_string;
 my $t = Test::Mojo->new(Mealmaps => {sqlite => ':temp:', secrets => ['test_s3cret']});
 
 my @enum = (
-  [qw(allergies             allergy      gluten     Gluten     dairy      Dairy)],
-  [qw(meals                 meal         breakfast  Breakfast  lunch      Lunch)],
-  [qw(seasons               season       spring     Spring     summer     Summer)],
-  [qw(religious_practices   practice     kosher     Kosher     no_beef    No_Beef)],
-  [qw(dietary_restrictions  restriction  vegetarian Vegetarian vegan      Vegan)],
-  [qw(food_dislikes         food         onions     Onions     mushrooms  Mushrooms)],
-  [qw(food_fears            food         casseroles Casseroles soups      Soups)],
-  [qw(units                 unit         cup        Cup        tablespoon Tablespoon)],
+  [qw(allergies             allergy      gluten     Gluten     dairy        Dairy)],
+  [qw(meals                 meal         breakfast  Breakfast  lunch        Lunch)],
+  [qw(seasons               season       spring     Spring     summer       Summer)],
+  [qw(religious_practices   practice     kosher     Kosher     no_beef      No_Beef)],
+  [qw(dietary_restrictions  restriction  vegetarian Vegetarian vegan        Vegan)],
+  [qw(food_dislikes         food         onions     Onions     mushrooms    Mushrooms)],
+  [qw(food_fears            food         casseroles Casseroles soups        Soups)],
+  [qw(units                 unit         cup        Cup        tablespoon   Tablespoon)],
+  [qw(exp_levels            exp_level    beginner   Beginner   intermediate Intermediate)],
+  [qw(source_types          source_type  book       Book       website      Website)],
 );
 foreach (@enum) {
   my ($table, $column, $id1, $name1, $id2, $name2) = @$_;
