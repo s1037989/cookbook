@@ -19,29 +19,32 @@ sub startup {
   my $meals = [map { $_->[0] } @{$config->{meals}}];
   my $secrets = $config->{secrets};
   $self->secrets($self->config('secrets'));
+  $self->sessions->default_expiration(86400 * 7);
 
   $self->helper(stash_session => sub { shift->stash('session', @_) });
-
-  # Model
-  $self->helper(sqlite => sub { state $sql = Mojo::SQLite->new->from_filename(shift->config('sqlite')) });
-  foreach my $module (find_modules 'Mealmaps::Model') {
-    # e.g. Mealmaps::Model::EnumSeasons -> enum.seasons
-    # e.g. Mealmaps::Model::Users       -> users
-    my $name = decamelize($module =~ s/^Mealmaps::Model:://r);
-    $name =~ s/_/./;
-    $self->helper($name => sub { state $model = $module->new(sqlite => shift->sqlite, config => $config) });
-  }
-
-  # Migrate to latest version if necessary
-  my $path = $self->home->child('migrations', 'mealmaps.sql');
-  $self->sqlite->auto_migrate(1)->migrations->name('mealmaps')->from_file($path);
-
   $self->helper(current_section => sub ($c, $name=undef) {
     return unless my $section = $c->stash('section');
     return $name eq $section if $name;
     return $section;
   });
   $self->helper(currency => sub ($c, $value) { usd($value) });
+
+  $self->app->validator->add_check(checked => sub ($v, $name, $value, $min=1, $max=undef) {
+    my $input = $v->input;
+    my $checked = grep { /^{$name}__/ && $input->{$input} } keys %$input;
+    warn "Checked $name: $checked";
+    return $checked >= $min && (!$max || $checked <= $max);
+  });
+
+  # Model
+  $self->helper(sqlite => sub { state $sql = Mojo::SQLite->new->from_filename(shift->config('sqlite')) });
+  foreach my $module (grep { /::[A-Z]+$/i } find_modules 'Mealmaps::Model') {
+    # e.g. Mealmaps::Model::EnumSeasons -> enum.seasons
+    # e.g. Mealmaps::Model::Users       -> users
+    my $name = decamelize($module =~ s/^Mealmaps::Model:://r);
+    $name =~ s/_/./;
+    $self->helper($name => sub { state $model = $module->new(sqlite => shift->sqlite, config => $config) });
+  }
 
   # Controller
   my $r = $self->routes;
@@ -94,6 +97,10 @@ sub startup {
   $admin_recipes->get('/:id/edit')->to('admin-recipes#edit')->name('edit_recipe');
   $admin_recipes->put('/:id')->to('admin-recipes#update')->name('update_recipe');
   $admin_recipes->delete('/:id')->to('admin-recipes#remove')->name('remove_recipe');
+
+  # Migrate to latest version if necessary
+  my $path = $self->home->child('migrations', 'mealmaps.sql');
+  $self->sqlite->auto_migrate(1)->migrations->name('mealmaps')->from_file($path);
 }
 
 1;

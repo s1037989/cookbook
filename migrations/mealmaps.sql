@@ -76,7 +76,7 @@ insert into enum_food_fears (food, name, seq) values ('stews', 'Stews', 3);
 insert into enum_food_fears (food, name, seq) values ('other', 'Other', 1000);
 
 create table if not exists enum_units (
-  unit         varchar(100) primary key collate nocase not null,
+  unit         varchar(15) primary key collate nocase not null,
   name         text collate nocase not null,
   seq          integer
 );
@@ -94,6 +94,24 @@ insert into enum_units (unit, name, seq) values ('liter', 'Liter', 11);
 insert into enum_units (unit, name, seq) values ('milliliter', 'Milliliter', 12);
 insert into enum_units (unit, name, seq) values ('other', 'Other', 1000);
 
+create table if not exists enum_categories (
+  category    varchar(100) primary key collate nocase not null,
+  name        text not null,
+  seq         integer
+);
+insert into enum_categories (category, name, seq) values ('pasta', 'Pasta', 1);
+insert into enum_categories (category, name, seq) values ('beef', 'Beef', 2);
+insert into enum_categories (category, name, seq) values ('chicken', 'Chicken', 3);
+
+create table if not exists enum_servings (
+  servings    varchar(100) primary key collate nocase not null,
+  name        text not null,
+  seq         integer
+);
+insert into enum_servings (servings, name, seq) values ('small', '1-2', 1);
+insert into enum_servings (servings, name, seq) values ('medium', '3-5', 2);
+insert into enum_servings (servings, name, seq) values ('large', '4-6', 3);
+
 create table if not exists enum_exp_levels (
   exp_level   varchar(100) primary key collate nocase not null,
   name        text not null,
@@ -102,6 +120,15 @@ create table if not exists enum_exp_levels (
 insert into enum_exp_levels (exp_level, name, seq) values ('beginner', 'Beginner', 1);
 insert into enum_exp_levels (exp_level, name, seq) values ('intermediate', 'Intermediate', 2);
 insert into enum_exp_levels (exp_level, name, seq) values ('advanced', 'Advanced', 3);
+
+create table if not exists enum_max_prep_times (
+  max_prep_time   varchar(100) primary key collate nocase not null,
+  name        text not null,
+  seq         integer
+);
+insert into enum_max_prep_times (max_prep_time, name, seq) values ('little', '<15 minutes', 1);
+insert into enum_max_prep_times (max_prep_time, name, seq) values ('some', '<45 minutes', 2);
+insert into enum_max_prep_times (max_prep_time, name, seq) values ('lots', '>=45 minutes', 3);
 
 create table if not exists enum_source_types (
   source_type varchar(100) primary key collate nocase not null,
@@ -114,7 +141,19 @@ insert into enum_source_types (source_type, name, seq) values ('magazine', 'Maga
 insert into enum_source_types (source_type, name, seq) values ('tv_show', 'TV Show', 4);
 insert into enum_source_types (source_type, name, seq) values ('other', 'Other', 5);
 
+create table if not exists enum_grocery_departments (
+  department  varchar(100) primary key collate nocase not null,
+  name        text not null,
+  seq         integer
+);
+insert into enum_grocery_departments (department, name, seq) values ('produce', 'Produce', 1);
+insert into enum_grocery_departments (department, name, seq) values ('bakery', 'Bakery', 2);
 
+create table if not exists enum_ingredients (
+  name        varchar(50) primary key collate nocase not null
+);
+insert into enum_ingredients (name) values ('eggs');
+insert into enum_ingredients (name) values ('milk');
 
 
 create table if not exists settings (
@@ -134,52 +173,76 @@ create table if not exists options (
 create table if not exists recipes (
   id            integer primary key autoincrement,
   created_at    datetime default current_timestamp,
-  title         text collate nocase not null,
-  servings      integer not null,
-  max_prep_time integer not null, -- in minutes
-  exp_level     not null references exp_levels(exp_level)
+  title         text collate nocase not null
 );
-
+create table if not exists recipe_categories (
+  id            integer primary key autoincrement,
+  created_at    datetime default current_timestamp,
+  recipe_id     integer not null,
+  category      varchar(100) not null references enum_categories(category),
+  foreign key (recipe_id) references recipes (id)
+);
+create table if not exists recipe_servings (
+  id            integer primary key autoincrement,
+  created_at    datetime default current_timestamp,
+  recipe_id     integer not null,
+  servings      varchar(100) not null references enum_servings(servings),
+  foreign key (recipe_id) references recipes (id)
+);
+create table if not exists recipe_exp_levels (
+  id            integer primary key autoincrement,
+  created_at    datetime default current_timestamp,
+  recipe_id     integer not null,
+  exp_level     varchar(100) not null references enum_exp_levels(exp_level),
+  foreign key (recipe_id) references recipes (id)
+);
+create table if not exists recipe_max_prep_times (
+  id            integer primary key autoincrement,
+  created_at    datetime default current_timestamp,
+  recipe_id     integer not null,
+  max_prep_time varchar(100) not null references enum_max_prep_times(max_prep_time),
+  foreign key (recipe_id) references recipes (id)
+);
 create table if not exists recipe_meals (
   id            integer primary key autoincrement,
   created_at    datetime default current_timestamp,
   recipe_id     integer not null,
-  meal          varchar(100) not null references meals(meal),
+  meal          varchar(100) not null references enum_meals(meal),
   foreign key (recipe_id) references recipes (id)
 );
 create table if not exists recipe_seasons (
   id            integer primary key autoincrement,
   created_at    datetime default current_timestamp,
   recipe_id     integer not null,
-  season        varchar(100) not null references seasons(season),
+  season        varchar(100) not null references enum_seasons(season),
   foreign key (recipe_id) references recipes (id)
 );
 create table if not exists recipe_allergies (
   id            integer primary key autoincrement,
   created_at    datetime default current_timestamp,
   recipe_id     integer not null,
-  allergy       varchar(100) not null references allergies(allergy),
+  allergy       varchar(100) not null references enum_allergies(allergy),
   foreign key (recipe_id) references recipes (id)
 );
 create table if not exists recipe_religious_practices (
   id            integer primary key autoincrement,
   created_at    datetime default current_timestamp,
   recipe_id     integer not null,
-  practice      varchar(100) not null references religious_practices(practice),
+  practice      varchar(100) not null references enum_religious_practices(practice),
   foreign key (recipe_id) references recipes (id)
 );
 create table if not exists recipe_dietary_restrictions (
   id            integer primary key autoincrement,
   created_at    datetime default current_timestamp,
   recipe_id     integer not null,
-  restriction   varchar(100) not null references dietary_restrictions(restriction),
+  restriction   varchar(100) not null references enum_dietary_restrictions(restriction),
   foreign key (recipe_id) references recipes (id)
 );
 create table if not exists recipe_food_dislikes (
   id            integer primary key autoincrement,
   created_at    datetime default current_timestamp,
   recipe_id     integer not null,
-  food          varchar(100) not null references food_dislikes(food),
+  food          varchar(100) not null references enum_food_dislikes(food),
   optional      integer not null default 0,
   foreign key (recipe_id) references recipes (id)
 );
@@ -187,18 +250,20 @@ create table if not exists recipe_food_fears (
   id            integer primary key autoincrement,
   created_at    datetime default current_timestamp,
   recipe_id     integer not null,
-  food          varchar(100) not null references food_fears(food),
+  food          varchar(100) not null references enum_food_fears(food),
   foreign key (recipe_id) references recipes (id)
 );
 create table if not exists recipe_ingredients (
   id          integer primary key autoincrement,
   created_at  datetime default current_timestamp,
   recipe_id   integer not null,
-  quantity    integer not null,
-  unit        varchar(100) not null references units(unit),
-  ingredient  text collate nocase not null,
+  quantity    varchar(10) not null,
+  unit        varchar(15) not null references enum_units(unit),
+  ingredient  varchar(50) not null references enum_ingredients(name),
+  department  varchar(50) not null references enum_grocery_departments(department),
   foreign key (recipe_id) references recipes (id)
 );
+
 
 create table if not exists recipe_sources (
   id          integer primary key autoincrement,
@@ -345,10 +410,11 @@ insert into user_allergies (user_id, allergy) values (1, 'test');
 insert into user_food_dislikes (user_id, food) values (1, 'test');
 insert into user_religious_practices (user_id, practice) values (1, 'test');
 insert into user_fear_foods (user_id, food) values (1, 'test');
-insert into recipes (title, servings, max_prep_time, exp_level) values ('Test Recipe', 4, 30, 'beginner');
+insert into recipes (title) values ('Test Recipe');
 insert into recipe_sources (recipe_id, source_type, source) values (1, 'website', 'https://www.example.com');
 insert into recipe_categories (recipe_id, category) values (1, 'test');
-insert into recipe_ingredients (recipe_id, quantity, unit, ingredient) values (1, 1, 'test', 'test');
+insert into recipe_ingredients (recipe_id, quantity, unit, ingredient, department) values (1, '1 2/3', 'cup', 'eggs', 'produce');
+insert into recipe_ingredients (recipe_id, quantity, unit, ingredient, department) values (1, '2 1/4', 'cup', 'milk', 'produce');
 insert into steps (recipe_id, step_number, instruction) values (1, 1, 'test');
 insert into tags (recipe_id, tag_type, tag) values (1, 'meal', 'test');
 insert into notes (recipe_id, note) values (1, 'test');

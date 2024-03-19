@@ -1,29 +1,33 @@
 % my $checkbox = begin
   % my ($tag_type, $tag, $label) = @_;
   % my $id = $tag_type . '__' . $tag;
+  % my %checked = $recipe->{$id} ? (checked => undef) : ();
   <div class="form-check">
-    <input class="form-check-input" type="checkbox" value="" id="<%= $id %>">
-    <label class="form-check-label" for="<%= $id %>">
-      <%= $label %>
-    </label>
+    %= check_box $id => 1, %checked, (class => 'form-check-input')
+    %= label_for $id => $label, (class => 'form-check-label')
   </div>
 % end
 
 % my $ingredient_field = begin
-  % my ($label, $name, $value) = @_;
+  % my ($n, $qty, $unit, $name, $dept) = @_;
+  % my %selected = (selected => 'selected');
+  % my $departments = $c->enum->grocery_departments->all
+  %   ->tap(sub { unshift @$_, {department => '', name => '', seq => 0}})
+  %   ->map(sub { [$_->{name} => $_->{department}, $dept && $dept eq $_->{department} ? %selected : ()] })
+  %   ->to_array;
+  % my $units = $c->enum->units->all
+  %   ->tap(sub { unshift @$_, {unit => '', name => '', seq => 0}})
+  %   ->map(sub { [$_->{name} => $_->{unit}, $unit && $unit eq $_->{unit} ? %selected : ()] })
+  %   ->to_array;
   <div class="input-group mb-3">
     <div class="input-group-prepend">
-      %= label_for $name => $label, (class => 'input-group-text')
+      %= label_for $name => "Ingredient $n", (class => 'input-group-text')
     </div>
-    <input type="number" class="form-control" id="quantity1" placeholder="Quantity">
-    <select class="form-control" id="unit1">
-      <option>Grams</option>
-      <option>Kilograms</option>
-      <option>Liters</option>
-      <option>Milliliters</option>
-      <!-- Add more units as needed -->
-    </select>
-    <input type="text" class="form-control" id="ingredient1" placeholder="Ingredient Name">
+    %= text_field "ingredient${n}__quantity" => $qty, (class => "form-control", placeholder => "Quantity")
+    %= select_field "ingredient${n}__unit" => $units, (class => "form-control", placeholder => "Units")
+    %= text_field "ingredient${n}__name" => $name, (class => "form-control", placeholder => "Ingredient Name")
+    %= select_field "ingredient${n}__department" => $departments, (class => "form-control", placeholder => "Department")
+  </fieldset>
   </div>
 % end
 
@@ -53,11 +57,45 @@
     <div class="input-group-prepend">
       %= label_for $name => $label, (class => 'input-group-text')
     </div>
-    %= file_field $name => $value, (class => "form-control")
+    %= file_field $name, (class => "form-control")
   </div>
 % end
 
+% my $error = begin
+  % my ($name) = @_;
+  % if (my $err = validation->error($name)) {
+    <div class="alert alert-danger" role="alert">
+    % if ($err->[0] =~ /^checked_/) {
+      % if ($err->[2] && $err->[3] && $err->[2] == $err->[3]) {
+        Requires exactly <%= $err->[2] %> <%= $err->[2] > 1 ? 'items' : 'item' %> to be checked
+      % } elsif ($err->[2] && $err->[3]) {
+        Requires <%= $err->[2] %> - <%= $err->[3] %> items to be checked
+      % } elsif ($err->[2] && !$err->[3]) {
+        Requires at least <%= $err->[2] %> <%= $err->[2] > 1 ? 'items' : 'item' %> to be checked
+      % } elsif (!$err->[2] && $err->[3]) {
+        Requires no more than <%= $err->[3] %> <%= $err->[3] > 1 ? 'items' : 'item' %> to be checked
+      % }
+    % }
+    % if ($err->[0] =~ /^ingredients$/) {
+      Requires at least 1 ingredient
+    % }
+    % if ($err->[0] =~ /^ingredient_incomplete$/) {
+      One or more ingredients are incomplete
+    % }
+    % if ($err->[0] =~ /^ingredient_quantity$/) {
+      One or more ingredients have an invalid quantity
+    % }
+    </div>
+  % }
+% end
+
 <div class="container">
+% if (my $db_error = stash 'db_error') {
+  <div class="alert alert-danger" role="alert">
+    %= $db_error
+  </div>
+% }
+
 %= form_for $target => (enctype => 'multipart/form-data') => begin
 
   <fieldset class="form-group">
@@ -66,73 +104,106 @@
     %= $file_field->('Image', image => $recipe->{image})
     %= $file_field->('Original PDF', original_pdf => $recipe->{original_pdf})
     %= $file_field->('Modified PDF', modified_pdf => $recipe->{modified_pdf})
-    %= $number_field->('Servings', servings => $recipe->{servings})
-    %= $number_field->('Maximum Preparation Time (in minutes)', max_prep_time => $recipe->{max_prep_time})
-    %= $number_field->('Experience Level', exp_level => $recipe->{exp_level})
-    %= $number_field->('Category', category => $recipe->{category})
+  </fieldset>
+
+  %= submit_button $caption
+
+  <fieldset class="form-group">
+    <legend>Category</legend>
+    %= $error->('categories')
+    % $c->enum->categories->all->each(sub {
+        %= $checkbox->(categories => @$_{qw/category name/})
+    % });
+  </fieldset>
+
+  <fieldset class="form-group">
+    <legend>Servings</legend>
+    %= $error->('servings')
+    % $c->enum->servings->all->each(sub {
+        %= $checkbox->(servings => @$_{qw/servings name/})
+    % });
+  </fieldset>
+
+  <fieldset class="form-group">
+    <legend>Experience Level</legend>
+    %= $error->('exp_levels')
+    % $c->enum->exp_levels->all->each(sub {
+        %= $checkbox->(exp_levels => @$_{qw/exp_level name/})
+    % });
+  </fieldset>
+
+  <fieldset class="form-group">
+    <legend>Max Prep Time</legend>
+    %= $error->('max_prep_times')
+    % $c->enum->max_prep_times->all->each(sub {
+        %= $checkbox->(max_prep_times => @$_{qw/max_prep_time name/})
+    % });
   </fieldset>
 
   <fieldset class="form-group">
     <legend>Meals</legend>
-    % my $meals = config 'meals';
-    % foreach (@$meals) {
-      %= $checkbox->(meals => @$_)
-    % }
+    %= $error->('meals')
+    % $c->enum->meals->all->each(sub {
+        %= $checkbox->(meals => @$_{qw/meal name/})
+    % });
   </fieldset>
 
   <fieldset class="form-group">
     <legend>Seasons</legend>
-    % my $seasons = config 'seasons';
-    % foreach (@$seasons) {
-      %= $checkbox->(seasons => @$_)
-    % }
+    %= $error->('seasons')
+    % $c->enum->seasons->all->each(sub {
+        %= $checkbox->(seasons => @$_{qw/season name/})
+    % });
   </fieldset>
 
   <fieldset class="form-group">
     <legend>Allergies</legend>
-    % my $allergies = config 'allergies';
-    % foreach (@$allergies) {
-      %= $checkbox->(allergies => @$_)
-    % }
+    %= $error->('allergies')
+    % $c->enum->allergies->all->each(sub {
+        %= $checkbox->(allergies => @$_{qw/allergy name/})
+    % });
   </fieldset>
 
   <fieldset class="form-group">
     <legend>Religious Practices</legend>
-    % my $religious = config 'religious';
-    % foreach (@$religious) {
-      %= $checkbox->(religious => @$_)
-    % }
+    %= $error->('religious_practices')
+    % $c->enum->religious_practices->all->each(sub {
+        %= $checkbox->(religious_practices => @$_{qw/practice name/})
+    % });
   </fieldset>
 
   <fieldset class="form-group">
     <legend>Dietary Restrictions</legend>
-    % my $diets = config 'diets';
-    % foreach (@$diets) {
-      %= $checkbox->(diets => @$_)
-    % }
+    %= $error->('dietary_restrictions')
+    % $c->enum->dietary_restrictions->all->each(sub {
+        %= $checkbox->(dietary_restrictions => @$_{qw/restriction name/})
+    % });
   </fieldset>
 
   <fieldset class="form-group">
     <legend>Food Dislikes</legend>
-    % my $dislikes = config 'dislikes';
-    % foreach (@$dislikes) {
-      %= $checkbox->(dislikes => @$_)
-      %= $checkbox->(optional_dislikes => @$_)
-    % }
+    %= $error->('dislike')
+    % $c->enum->food_dislikes->all->each(sub {
+        %= $checkbox->(food_dislikes => @$_{qw/food name/})
+        %= $checkbox->(optional_food_dislikes => @$_{qw/food name/})
+    % });
   </fieldset>
 
   <fieldset class="form-group">
     <legend>Eating Disorder Struggles</legend>
-    % my $fear_foods = config 'fear_foods';
-    % foreach (@$fear_foods) {
-      %= $checkbox->(fear_foods => @$_)
-    % }
+    %= $error->('food_fears')
+    % $c->enum->food_fears->all->each(sub {
+        %= $checkbox->(food_fears => @$_{qw/food name/})
+    % });
   </fieldset>
 
   <fieldset class="form-group">
     <legend>Ingredients</legend>
-    %= $ingredient_field->('Ingredient 1', 'ingredient1', $recipe->{ingredient1})
-    %= $ingredient_field->('Ingredient 2', 'ingredient2', $recipe->{ingredient2})
+    %= $error->('ingredients')
+    % for my $n (1..20) {
+      % my @components = (map { "ingredient${n}__$_" } qw(quantity unit name department));
+      %= $ingredient_field->($n, @$recipe{@components})
+    % }
   </fieldset>
 
   %= submit_button $caption
