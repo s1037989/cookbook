@@ -95,6 +95,7 @@ sub startup {
   my $admin = $mm->under('/admin' => {section => 'admin'})->to('mealmaps#auth')
     ->under('/')->to('admin#auth');
   my $admin_recipes = $admin->under('/recipes');
+  $admin_recipes->get('/')->to('admin-recipes#manage')->name('manage_recipes');
   $admin_recipes->get('/rotate')->to('admin-recipes#rotate')->name('rotate_recipes');
   $admin_recipes->get('/create')->to('admin-recipes#create')->name('create_recipe');
   $admin_recipes->post('/')->to('admin-recipes#store')->name('store_recipe');
