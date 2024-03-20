@@ -44,6 +44,10 @@ sub startup {
     $self->helper($name => sub { state $model = $module->new(sqlite => shift->sqlite, config => $config) });
   }
 
+  # Migrate to latest version if necessary
+  my $path = $self->home->child('migrations', 'mealmaps.sql');
+  $self->sqlite->auto_migrate(1)->migrations->name('mealmaps')->from_file($path);
+
   my $meals = $self->enum->meals->all->map(sub { $_->{name} })->to_array;
 
   # Controller
@@ -97,10 +101,6 @@ sub startup {
   $admin_recipes->get('/:id/edit')->to('admin-recipes#edit')->name('edit_recipe');
   $admin_recipes->put('/:id')->to('admin-recipes#update')->name('update_recipe');
   $admin_recipes->delete('/:id')->to('admin-recipes#remove')->name('remove_recipe');
-
-  # Migrate to latest version if necessary
-  my $path = $self->home->child('migrations', 'mealmaps.sql');
-  $self->sqlite->auto_migrate(1)->migrations->name('mealmaps')->from_file($path);
 }
 
 1;
