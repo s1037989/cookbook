@@ -10,14 +10,13 @@ sub edit ($self) {
   $self->render(recipe => $self->recipes->find($self->param('id')));
 }
 
-sub index ($self) {
-  my $meal = $self->param('meal');
-  $self->render(meal => $meal, recipes => $self->recipes->all($meal));
+sub manage ($self) {
+  $self->render(recipes => $self->recipes->all);
 }
 
 sub remove ($self) {
   $self->recipes->remove($self->param('id'));
-  $self->redirect_to('recipes');
+  $self->redirect_to('manage_recipes');
 }
 
 sub rotate ($self) {
@@ -109,7 +108,7 @@ sub _validation ($self) {
 
   return $v if $v->has_error;
 
-  $self->enum->ingredients->add(map { $v->output->{$_} } grep { /^ingredient(\d+)__name$/ } keys %{$v->output});
+  $self->ingredients->add(map { $v->output->{$_} } grep { /^ingredient(\d+)__name$/ } keys %{$v->output});
 
   return $v;
 }

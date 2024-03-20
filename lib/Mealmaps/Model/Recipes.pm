@@ -41,8 +41,7 @@ sub add ($self, $title, $enum, $ingredients) {
   return $id unless $@;
 }
 
-sub all ($self, $meal=undef) {
-  # $self->sqlite->db->select('recipes', undef, {active => {'!=' => undef}, meal => $meal})->hashes;
+sub all ($self) {
   $self->sqlite->db->select('recipes')->hashes;
 }
 
@@ -66,7 +65,15 @@ sub find ($self, $id) {
 }
 
 sub remove ($self, $id) {
-  $self->sqlite->db->delete('recipes', {id => $id});
+  my $db = $self->sqlite->db;
+  eval {
+    my $tx = $db->begin;
+    $db->delete("recipe_$_", {recipe_id => $id}) for map { $_->[0] } @enum;
+    $db->delete('recipe_ingredients', {recipe_id => $id});
+    $id = $db->delete('recipes', {id => $id});
+    $tx->commit;
+  };
+  return $id unless $@;
 }
 
 sub rotate ($self, $recipes=2) {
