@@ -13,10 +13,8 @@ sub startup {
 
   # Configuration
   my $config = $self->plugin('Config' => {default => {
-    meals => [qw(Breakfast Lunch Dinner)],
     meal_options => 3,
   }});
-  my $meals = [map { $_->[0] } @{$config->{meals}}];
   my $secrets = $config->{secrets};
   $self->secrets($self->config('secrets'));
   $self->sessions->default_expiration(86400 * 7);
@@ -45,6 +43,8 @@ sub startup {
     $name =~ s/_/./;
     $self->helper($name => sub { state $model = $module->new(sqlite => shift->sqlite, config => $config) });
   }
+
+  my $meals = $self->enum->meals->all->map(sub { $_->{name} })->to_array;
 
   # Controller
   my $r = $self->routes;
