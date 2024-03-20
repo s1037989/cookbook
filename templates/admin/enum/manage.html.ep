@@ -1,0 +1,14 @@
+% layout 'mealmaps', title => 'Mealmaps';
+% content headline => '';
+% content main_form => '';
+
+% content overlay => begin
+% end
+
+% content solid => begin
+<p><%= link_to 'Back to Metadata list', 'list_enums' %></p>
+%= form_for 'form_edit_enum' => begin
+  <p><%= select_field 'id' => $records->map(sub{[$_->{name} => $_->{$pk}]})->to_array %><%= submit_button 'Go' %></p>
+  <p><%= link_to 'New entry' => 'create_enum' %></p>
+% end
+% end

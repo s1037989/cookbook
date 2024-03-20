@@ -1,0 +1,13 @@
+% layout 'mealmaps', title => 'Mealmaps';
+% content headline => '';
+% content main_form => '';
+
+% content overlay => begin
+% end
+
+% content solid => begin
+<p><%= link_to 'Back to Manage Recipes', 'manage_recipes' %></p>
+%= form_for 'list_enums' => begin
+  <p><%= select_field 'enum' => $helpers %><%= submit_button 'Go' %></p>
+% end
+% end

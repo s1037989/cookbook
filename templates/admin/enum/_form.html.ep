@@ -1,0 +1,11 @@
+%= form_for $target => (method => 'post') => begin
+  <p>
+  %= label_for 'name' => 'Name'
+  %= text_field 'name', $record->{name}
+  </p>
+  <p>
+    %= label_for 'seq' => 'Sequence'
+    %= number_field 'seq', $record->{seq}
+  </p>
+  %= submit_button $caption
+% end

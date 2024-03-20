@@ -94,6 +94,16 @@ sub startup {
 
   my $admin = $mm->under('/admin' => {section => 'admin'})->to('mealmaps#auth')
     ->under('/')->to('admin#auth');
+  $admin->get('/enum')->to('admin-enum#index')->name('list_enums');
+  my $admin_enum = $admin->under('/enum/:enum');
+  $admin_enum->get('/')->to('admin-enum#manage')->name('manage_enum');
+  $admin_enum->get('/create')->to('admin-enum#create')->name('create_enum');
+  $admin_enum->post('/')->to('admin-enum#store')->name('store_enum');
+  $admin_enum->get('/edit')->to(cb => sub ($c) { $c->redirect_to('edit_enum', id => $c->param('id')) })->name('form_edit_enum');
+  $admin_enum->get('/:id')->to('admin-enum#show')->name('show_enum');
+  $admin_enum->get('/:id/edit')->to('admin-enum#edit')->name('edit_enum');
+  $admin_enum->put('/:id')->to('admin-enum#update')->name('update_enum');
+  $admin_enum->delete('/:id')->to('admin-enum#remove')->name('remove_enum');
   my $admin_recipes = $admin->under('/recipes');
   $admin_recipes->get('/')->to('admin-recipes#manage')->name('manage_recipes');
   $admin_recipes->get('/rotate')->to('admin-recipes#rotate')->name('rotate_recipes');

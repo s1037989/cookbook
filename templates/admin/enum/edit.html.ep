@@ -1,0 +1,24 @@
+% layout 'mealmaps', title => 'Mealmaps';
+% content headline => '';
+% content main_form => '';
+
+% content overlay => begin
+% end
+
+% content solid => begin
+<h2>Edit recipe</h2>
+% if (my $db_insert = flash 'db_insert') {
+  <div class="alert alert-success" role="alert">
+    Added recipe
+  </div>
+% }
+% if (my $db_update = flash 'db_update') {
+  <div class="alert alert-success" role="alert">
+    Updated recipe
+  </div>
+% }
+<p><%= link_to "Back to $enum list", 'manage_enum' => {enum => $enum} %></p>
+<h3>Update <%= $record->{$pk} %></h3>
+%= include 'admin/enum/_form', caption => "Update $record->{$pk}", target => 'update_enum'
+%= button_to "Remove $record->{name}" => 'remove_enum' => {enum => $enum, id => $record->{$pk}}, (class => 'btn btn-danger', data => {confirm => 'Are you sure?'})
+% end

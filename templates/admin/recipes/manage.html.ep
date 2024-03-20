@@ -8,6 +8,7 @@
 
 % content solid => begin
 <h1><%= $recipes->size %> <%= $recipes->size == 1 ? 'recipe' : 'recipes' %></h1>
+%= link_to 'Manage Metadata' => 'list_enums'
 % $recipes->each(sub {
   <h2><%= link_to $_->{title} => edit_recipe => {id => $_->{id}} %></h2>
   <p>
