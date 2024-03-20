@@ -44,7 +44,7 @@ sub store ($self) {
 
   # Store record
   my $id = slugify($v->param('name'));
-  $self->enum->$enum->add($pk, $v->param('name'), $v->param('seq'));
+  $self->enum->$enum->add($id, $v->param('name'), $v->param('seq'));
   return $self->render(action => 'create', enum => $enum, db_error => $@, record => {}) if $@;
 
   $self->flash(db_insert => 1)->redirect_to('edit_enum', id => $id);
