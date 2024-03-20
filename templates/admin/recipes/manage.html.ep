@@ -1,0 +1,19 @@
+% layout 'mealmaps', title => 'Manage Recipes';
+% content headline => '';
+% content main_form => '';
+
+% content overlay => begin
+  <h2>Build a MealMAPS Plan today!</h2>
+% end
+
+% content solid => begin
+<h1><%= $recipes->size %> <%= $recipes->size == 1 ? 'recipe' : 'recipes' %></h1>
+% $recipes->each(sub {
+  <h2><%= link_to $_->{title} => edit_recipe => {id => $_->{id}} %></h2>
+  <p>
+    %= image "recipes/$_->{id}.png", alt => $_->{title}, width => 300, height => 300
+  </p>
+  <p><%= button_to 'Remove Recipe' => remove_recipe => {id => $_->{id}} %></p>
+% });
+<p><%= link_to 'New recipe' => 'create_recipe' %></p>
+% end

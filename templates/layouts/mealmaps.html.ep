@@ -54,7 +54,7 @@
                         <li class="nav-item"><%= link_to 'MealMAPS Home' => 'home', $active->('home', 'nav-item nav-link') %></li>
                         % if (stash_session('user.admin')) {
                         <li class="nav-item"><%= link_to 'Minion' => 'minion', $active->('minion', 'nav-item nav-link') %></li>
-                        <li class="nav-item"><%= link_to 'Manage Recipes' => 'recipes', $active->('tpas', 'nav-item nav-link') %></li>
+                        <li class="nav-item"><%= link_to 'Manage Recipes' => 'manage_recipes', $active->('tpas', 'nav-item nav-link') %></li>
                         <li class="nav-item"><%= link_to 'Manage Users' => 'users', $active->('users', 'nav-item nav-link') %></li>
                         % }
                         % if (stash_session('user.username')) {

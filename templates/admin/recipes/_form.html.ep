@@ -185,7 +185,7 @@
     %= $error->('dislike')
     % $c->enum->food_dislikes->all->each(sub {
         %= $checkbox->(food_dislikes => @$_{qw/food name/})
-        %= $checkbox->(optional_food_dislikes => @$_{qw/food name/})
+        %#= $checkbox->(optional_food_dislikes => @$_{qw/food name/})
     % });
   </fieldset>
 
