@@ -95,6 +95,11 @@
     %= $db_error
   </div>
 % }
+% if (validation->has_error) {
+  <div class="alert alert-danger" role="alert">
+    One or more issues were found with your submission. Please correct them and try again.
+  </div>
+% }
 
 %= form_for $target => (enctype => 'multipart/form-data') => begin
 
