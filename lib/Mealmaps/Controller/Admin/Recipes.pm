@@ -56,7 +56,7 @@ sub update ($self) {
 }
 
 sub _store_attachments ($self, $hash, $id) {
-  my $img = $hash->{image};
+  my $img = $hash->output->{image};
   $img->move_to($self->app->home->child('public', 'recipes')->make_path->child("$id.png")) if $img;
   my $pdf1 = $hash->{original_pdf};
   $pdf1->move_to($self->app->home->child('public', 'recipes')->make_path->child("$id.pdf")) if $pdf1;
